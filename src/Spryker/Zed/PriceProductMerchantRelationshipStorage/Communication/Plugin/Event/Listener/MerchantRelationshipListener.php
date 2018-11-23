@@ -7,14 +7,15 @@
 
 namespace Spryker\Zed\PriceProductMerchantRelationshipStorage\Communication\Plugin\Event\Listener;
 
-use Spryker\Shared\PriceProductMerchantRelationshipStorage\PriceProductMerchantRelationshipStorageConstants;
 use Spryker\Zed\Event\Dependency\Plugin\EventBulkHandlerInterface;
 use Spryker\Zed\Kernel\Communication\AbstractPlugin;
+use Spryker\Zed\PriceProductMerchantRelationshipStorage\PriceProductMerchantRelationshipStorageConfig;
 
 /**
  * @method \Spryker\Zed\PriceProductMerchantRelationshipStorage\Business\PriceProductMerchantRelationshipStorageFacadeInterface getFacade()
  * @method \Spryker\Zed\PriceProductMerchantRelationshipStorage\Communication\PriceProductMerchantRelationshipStorageCommunicationFactory getFactory()
  * @method \Spryker\Zed\PriceProductMerchantRelationshipStorage\Persistence\PriceProductMerchantRelationshipStorageRepositoryInterface getRepository()
+ * @method \Spryker\Zed\PriceProductMerchantRelationshipStorage\PriceProductMerchantRelationshipStorageConfig getConfig()
  */
 class MerchantRelationshipListener extends AbstractPlugin implements EventBulkHandlerInterface
 {
@@ -30,12 +31,15 @@ class MerchantRelationshipListener extends AbstractPlugin implements EventBulkHa
      */
     public function handleBulk(array $eventTransfers, $eventName): void
     {
-        $businessUnitIds = array_merge(
-            $this->getFactory()->getEventBehaviorFacade()->getEventTransferForeignKeys($eventTransfers, PriceProductMerchantRelationshipStorageConstants::COL_FK_COMPANY_BUSINESS_UNIT),
+        $companyBusinessUnitIds = array_merge(
+            $this->getFactory()->getEventBehaviorFacade()->getEventTransferForeignKeys(
+                $eventTransfers,
+                PriceProductMerchantRelationshipStorageConfig::COL_FK_COMPANY_BUSINESS_UNIT
+            ),
             $this->getFactory()->getEventBehaviorFacade()->getEventTransferIds($eventTransfers)
         );
 
-        $this->getFacade()->publishAbstractPriceProductByBusinessUnits($businessUnitIds);
-        $this->getFacade()->publishConcretePriceProductByBusinessUnits($businessUnitIds);
+        $this->getFacade()->publishAbstractPriceProductByBusinessUnits($companyBusinessUnitIds);
+        $this->getFacade()->publishConcretePriceProductByBusinessUnits($companyBusinessUnitIds);
     }
 }
